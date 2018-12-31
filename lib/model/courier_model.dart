@@ -1,4 +1,5 @@
 import 'petshop_model.dart';
+
 class Courier {
   String idPetshop;
   String id;
@@ -13,7 +14,7 @@ class Courier {
   Courier();
 
   Courier.fromSnapshot(Map<dynamic, dynamic> snapshot)
-      : this.id = snapshot["id"],
+      : id = snapshot["id"],
         username = snapshot["username"],
         name = snapshot["name"],
         petshop = Petshop.fromSnapshot(snapshot["petshop"]),
@@ -33,5 +34,16 @@ class Courier {
   Map<String, dynamic> toJsonLogin() => {
         "username": username,
         "password": password,
+      };
+  Map<String, dynamic> toJsonData() => {
+        "id": id,
+        "username": username,
+        "petshop": {
+          "id": petshop.id,
+        },
+        "name": name,
+        "latitude": latitude,
+        "longitude": longitude,
+        "enabled": enabled,
       };
 }

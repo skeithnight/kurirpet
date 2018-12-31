@@ -24,6 +24,7 @@ dependencies:
   dio: ^1.0.9
   http: ^0.12.0 
   flutter_map:
+  geolocator: '^2.1.1'
 
 dev_dependencies:
   flutter_test:

@@ -1,7 +1,6 @@
 var appName = "Sahi Pet";
-var baseURL = "http://{your_ip}";
+var baseURL = "http://{your-ip}";
 // Authentication
-var urlRegister = "$baseURL/courier/register";
 var urlLogin = "$baseURL/courier/login";
 var urlCheckSession = "$baseURL/courier/check-session";
 // Courier
@@ -15,3 +14,6 @@ List<String> listEnabled = ["True", "False"];
 var urlGrooming = "$baseURL/grooming";
 var urlClinic = "$baseURL/clinic";
 var urlHotel = "$baseURL/hotel";
+
+// Order
+var urlOrder = "$baseURL/transaction";

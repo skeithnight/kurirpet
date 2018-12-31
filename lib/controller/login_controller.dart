@@ -15,23 +15,24 @@ class LoginController {
   Dio dio = new Dio();
   void sendData(Courier courier) async {
     if (checkData(courier)) {
-      var response =
-          await dio.post(data1.urlLogin, data: courier.toJsonLogin());
-      if (response.statusCode == 200) {
+      try {
+        var response =
+            await dio.post(data1.urlLogin, data: courier.toJsonLogin());
         // If server returns an OK response, parse the JSON
         SharedPreferences _prefs = await SharedPreferences.getInstance();
         _prefs.setString('token', response.data['token']);
         _prefs.commit();
         DialogWidget(context: context, dismiss: true)
             .tampilDialog("Success", "Success login..", MainScreen());
-      } else {
-        // If that response was not OK, throw an error.
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: ((context) => LoginPage())));
-        // throw Exception('Failed to load post');
+      } on DioError catch (e) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx and is also not 304.
+        print(e.message);
+        DialogWidget(context: context, dismiss: false)
+            .tampilDialog("Failed", e.message, () {});
       }
     } else {
-      DialogWidget(context: context)
+      DialogWidget(context: context, dismiss: false)
           .tampilDialog("Failed", "The Data cannot empty!", () {});
     }
   }
@@ -56,33 +57,43 @@ class LoginController {
 
   Future<String> checkToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    checkSession();
     if (prefs.getString('token') == null ||
         prefs.getString('idCourier') == null) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: ((context) => LoginPage())));
-    } else {}
+    }
     return prefs.getString('token');
   }
 
   Future<Courier> checkSession() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    dio.options.headers = {
-      "Authorization": "Bearer " + prefs.getString('token') ?? ''
-    };
+    // print("aa");
     Response response;
+    Courier courier;
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers = {
+        "Authorization": "Bearer " + prefs.getString('token') ?? ''
+      };
       response = await dio.get(data1.urlCheckSession);
-    } on DioError catch(e) {
+      if (response.data != "") {
+        courier = Courier.fromSnapshot(response.data);
+        prefs.setString("idCourier", courier.id);
+        prefs.setString("idPetshop", courier.petshop.id);
+        prefs.setString("data", json.encode(courier.toJsonData()));
+        // prefs.setString("data", json.encode(courier).toString());
+        print(prefs.getString('idPetshop'));
+        prefs.commit();
+      } else {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: ((context) => LoginPage())));
+      }
+    } on DioError catch (e) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx and is also not 304.
       print(e.message);
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: ((context) => LoginPage())));
-  }
-    Courier courier = Courier.fromSnapshot(response.data);
-    prefs.setString("idCourier", courier.id);
-    prefs.commit();
+    }
     return courier;
   }
 }
