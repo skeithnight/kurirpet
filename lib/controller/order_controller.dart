@@ -9,6 +9,7 @@ import 'package:kurirpet/model/courier_model.dart';
 import 'package:kurirpet/data.dart' as data1;
 import 'package:kurirpet/screens/widget/dialog_widget.dart';
 import 'package:kurirpet/main.dart';
+import 'package:kurirpet/model/detail_transaksi_model.dart';
 
 
 class OrderController {
@@ -20,26 +21,44 @@ class OrderController {
   Dio dio = new Dio();
   // Get Data
   Future<List<Order>> getListData() async {
-    // print("aa");
     prefs = await SharedPreferences.getInstance();
-    List<Order> listOrder = new List();
     dio.options.headers = {
       "Authorization": "Bearer " + prefs.getString('token') ?? ''
     };
     dio.options.baseUrl = data1.urlOrder;
-    try {
-      var response = await dio.get('/petshop/${prefs.getString('idPetshop')}');
-      List<dynamic> map = response.data;
-      // print(response.data);
-      for (var i = 0; i < map.length; i++) {
-        // print(map[i]["courier"]);
-        listOrder.add(Order.fromSnapshot(map[i]));
+
+    var response = await dio.get('/petshop/${prefs.getString('idPetshop')}');
+    List<dynamic> map = response.data;
+    // print(map[0]['groomings']);
+    List<Order> listOrder = new List();
+    List<DetailTransaksi> listGroomings = new List();
+    List<DetailTransaksi> listClinics = new List();
+    List<DetailTransaksi> listHotels = new List();
+    for (var i = 0; i < map.length; i++) {
+      if (map[i]['groomings'] != null) {
+        for (var j = 0; j < map[i]['groomings'].length; j++) {
+          listGroomings
+              .add(DetailTransaksi.fromSnapshot(map[i]['groomings'][j]));
+        }
+      } else {
+        listGroomings = null;
       }
-    } on DioError catch (e) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx and is also not 304.
-      DialogWidget(context: context, dismiss: false)
-          .tampilDialog("Failed", e.message, () {});
+      if (map[i]['clinics'] != null) {
+        for (var j = 0; j < map[i]['clinics'].length; j++) {
+          listClinics.add(DetailTransaksi.fromSnapshot(map[i]['clinics'][j]));
+        }
+      } else {
+        listClinics = null;
+      }
+      if (map[i]['hotels'] != null) {
+        for (var j = 0; j < map[i]['hotels'].length; j++) {
+          listHotels.add(DetailTransaksi.fromSnapshot(map[i]['hotels'][j]));
+        }
+      } else {
+        listHotels = null;
+      }
+      listOrder.add(
+          Order.fromSnapshot(map[i], listGroomings, listClinics, listHotels));
     }
     return listOrder;
   }

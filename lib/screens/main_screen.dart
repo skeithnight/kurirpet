@@ -96,7 +96,9 @@ class _MainScreenState extends State<MainScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.lightGreen,
-        onPressed: () {LocationController().saveTestLocation();},
+        onPressed: () {
+          LocationController().saveTestLocation();
+        },
         tooltip: 'test location',
         child: Icon(Icons.place),
       ),

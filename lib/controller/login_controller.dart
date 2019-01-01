@@ -27,7 +27,7 @@ class LoginController {
       } on DioError catch (e) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx and is also not 304.
-        print(e.message);
+        print("send Data : " + e.message);
         DialogWidget(context: context, dismiss: false)
             .tampilDialog("Failed", e.message, () {});
       }
@@ -57,8 +57,7 @@ class LoginController {
 
   Future<String> checkToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getString('token') == null ||
-        prefs.getString('idCourier') == null) {
+    if (prefs.getString('token') == null) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: ((context) => LoginPage())));
     }
@@ -75,7 +74,9 @@ class LoginController {
         "Authorization": "Bearer " + prefs.getString('token') ?? ''
       };
       response = await dio.get(data1.urlCheckSession);
+      // print(response.data);
       if (response.data != "") {
+        // print("nooo");
         courier = Courier.fromSnapshot(response.data);
         prefs.setString("idCourier", courier.id);
         prefs.setString("idPetshop", courier.petshop.id);
@@ -83,16 +84,16 @@ class LoginController {
         // prefs.setString("data", json.encode(courier).toString());
         print(prefs.getString('idPetshop'));
         prefs.commit();
-      } else {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: ((context) => LoginPage())));
       }
+      // print("noooo");
     } on DioError catch (e) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx and is also not 304.
-      print(e.message);
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: ((context) => LoginPage())));
+      print("check Session : " + e.message);
+      DialogWidget(context: context, dismiss: false)
+          .tampilDialog("Failed", e.message, () {});
+      // Navigator.pushReplacement(
+      //     context, MaterialPageRoute(builder: ((context) => LoginPage())));
     }
     return courier;
   }

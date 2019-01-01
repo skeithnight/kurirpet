@@ -11,6 +11,7 @@ import 'package:kurirpet/data.dart' as data1;
 import 'package:kurirpet/model/order_model.dart';
 import 'package:kurirpet/controller/order_controller.dart';
 import 'package:kurirpet/screens/widget/maps_widget.dart';
+import 'package:kurirpet/model/detail_transaksi_model.dart';
 
 class DetailOrderPage extends StatefulWidget {
   String level = "detail";
@@ -38,6 +39,30 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
     });
   }
 
+  double hitungTagihan(Order order){
+    double totalGrooming = 0;
+    double totalClinic = 0;
+    double totalHotel = 0;
+
+    if(order.groomings != null){
+      for (var item in order.groomings) {
+        totalGrooming = totalGrooming + (item.jumlah * item.service.price);
+      }
+    }
+    if(order.clinics != null){
+      for (var item in order.clinics) {
+        totalClinic = totalClinic + (item.jumlah * item.service.price);
+      }
+    }
+    if(order.hotels != null){
+      for (var item in order.hotels) {
+        totalHotel = totalHotel + (item.jumlah * item.service.price);
+      }
+    }
+    return totalGrooming + totalClinic + totalHotel;
+  }
+
+
   Widget orderContent() => Container(
         padding: EdgeInsets.all(10.0),
         width: double.infinity,
@@ -64,19 +89,38 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
                     ? Text("Belum di jemput")
                     : Text(order.courier.name),
               ),
+              order.groomings != null
+                  ? showExpansionTile("Pesanan Grooming", order.groomings)
+                  : Container(),
+              order.clinics != null
+                  ? showExpansionTile("Pesanan Klinik", order.clinics)
+                  : Container(),
+              order.hotels != null
+                  ? showExpansionTile("Pesanan Hotel", order.hotels)
+                  : Container(),
               ListTile(
-                title: Text("Pesanan"),
-                subtitle: Card(
-                  child: Container(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text("Grooming Biasa"),
-                  ),
-                ),
+                title: Text("Total Tagihan"),
+                subtitle: Text("Rp. ${hitungTagihan(order)}"),
               ),
             ],
           ),
         ),
       );
+
+  Widget showExpansionTile(String title, List<DetailTransaksi> listData) {
+    List<Widget> listDataWidget = [];
+    for (var item in listData) {
+      listDataWidget.add(new ListTile(
+        title: Text(item.service.name),
+        subtitle: Text("Jumlah : ${item.jumlah}"),
+        trailing: Text("Rp. ${item.jumlah * item.service.price}"),
+      ));
+    }
+    return ExpansionTile(
+      title: Text(title),
+      children: listDataWidget,
+    );
+  }
 
   Widget mapswidget() => new Container(
         padding: EdgeInsets.all(10.0),

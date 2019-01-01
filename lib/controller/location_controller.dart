@@ -42,6 +42,7 @@ class LocationController {
           new Courier.fromSnapshot(json.decode(prefs.getString('data')));
       car.latitude = position.latitude;
       car.longitude = position.longitude;
+      // print(car.roles);
       dio.options.headers = {
         "Authorization": "Bearer " + prefs.getString('token') ?? ''
       };

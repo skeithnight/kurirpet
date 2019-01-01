@@ -10,6 +10,7 @@ class Courier {
   double latitude;
   double longitude;
   bool enabled;
+  List<dynamic> roles;
 
   Courier();
 
@@ -20,6 +21,7 @@ class Courier {
         petshop = Petshop.fromSnapshot(snapshot["petshop"]),
         latitude = snapshot["latitude"],
         longitude = snapshot["longitude"],
+        roles = snapshot["roles"],
         enabled = snapshot["enabled"];
 
   Map<String, dynamic> toJsonInsert() => {
@@ -45,5 +47,6 @@ class Courier {
         "latitude": latitude,
         "longitude": longitude,
         "enabled": enabled,
+        "roles": roles,
       };
 }
